@@ -1,6 +1,6 @@
 import Head from "next/head"
 import dynamic from "next/dynamic"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import Image from "next/image"
 import {
   ChevronDown, Building2, Factory, Wrench, ShieldCheck,
@@ -15,6 +15,62 @@ import { NumberTicker } from "@/src/components/NumberTicker"
 
 // Lazy-load Vanta — never block render
 const VantaHero = dynamic(() => import("@/src/components/VantaHero"), { ssr: false })
+
+// ─── GSAP SCROLL REVEAL HOOK ───
+function useScrollReveal() {
+  const ref = useRef(null)
+  useEffect(() => {
+    if (!ref.current) return
+    const el = ref.current
+    el.style.opacity = "0"
+    el.style.transform = "translateY(40px)"
+    el.style.transition = "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.style.opacity = "1"
+          el.style.transform = "translateY(0)"
+          observer.unobserve(el)
+        }
+      },
+      { threshold: 0.15 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+  return ref
+}
+
+// Staggered children reveal
+function useStaggerReveal(count) {
+  const refs = useRef([])
+  useEffect(() => {
+    const observers = []
+    refs.current.forEach((el, i) => {
+      if (!el) return
+      el.style.opacity = "0"
+      el.style.transform = "translateY(30px)"
+      el.style.transition = `opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${i * 150}ms, transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${i * 150}ms`
+
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            el.style.opacity = "1"
+            el.style.transform = "translateY(0)"
+            observer.unobserve(el)
+          }
+        },
+        { threshold: 0.1 }
+      )
+      observer.observe(el)
+      observers.push(observer)
+    })
+    return () => observers.forEach(o => o.disconnect())
+  }, [])
+  const setRef = useCallback((i) => (el) => { refs.current[i] = el }, [])
+  return setRef
+}
 
 // ─── HERO ───
 function Hero() {
@@ -139,10 +195,13 @@ function Services() {
     },
   ]
 
+  const headingRef = useScrollReveal()
+  const setCardRef = useStaggerReveal(services.length)
+
   return (
     <section id="services" className="py-20 bg-bg">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-14">
+        <div ref={headingRef} className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold mb-4">Nos Services</h2>
           <p className="text-txt2 max-w-2xl mx-auto">
             Des solutions sur mesure pour les développeurs immobiliers, les entreprises et les institutions.
@@ -151,16 +210,18 @@ function Services() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {services.map(({ Icon, title, desc }, i) => (
-            <GlowCard key={i} className="p-8 group">
-              <div className="w-14 h-14 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-6 group-hover:bg-accent/20 transition-colors">
-                <Icon className="w-7 h-7 text-accent" />
-              </div>
-              <h3 className="text-xl font-heading font-bold mb-3">{title}</h3>
-              <p className="text-sm text-txt2 leading-relaxed mb-4">{desc}</p>
-              <a href="#contact" className="inline-flex items-center gap-1 text-sm text-accent font-medium hover:gap-2 transition-all">
-                En savoir plus <ArrowRight className="w-4 h-4" />
-              </a>
-            </GlowCard>
+            <div key={i} ref={setCardRef(i)}>
+              <GlowCard className="p-8 group h-full">
+                <div className="w-14 h-14 rounded-2xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-6 group-hover:bg-accent/20 transition-colors">
+                  <Icon className="w-7 h-7 text-accent" />
+                </div>
+                <h3 className="text-xl font-heading font-bold mb-3">{title}</h3>
+                <p className="text-sm text-txt2 leading-relaxed mb-4">{desc}</p>
+                <a href="#contact" className="inline-flex items-center gap-1 text-sm text-accent font-medium hover:gap-2 transition-all">
+                  En savoir plus <ArrowRight className="w-4 h-4" />
+                </a>
+              </GlowCard>
+            </div>
           ))}
         </div>
       </div>
@@ -171,16 +232,18 @@ function Services() {
 // ─── PROJECTS SHOWCASE ───
 function Projects() {
   const projects = [
-    { title: "Complexe résidentiel", scope: "120 logements", location: "Lanaudière", stat: "Installation complète" },
-    { title: "Centre commercial", scope: "15 000 pi²", location: "Joliette", stat: "Plomberie commerciale" },
-    { title: "Condo neuf", scope: "48 unités", location: "Repentigny", stat: "Construction neuve" },
-    { title: "Hôpital régional", scope: "Rénovation majeure", location: "Saint-Charles-Borromée", stat: "Infrastructure critique" },
+    { title: "Complexe résidentiel", scope: "120 logements", location: "Lanaudière", stat: "Installation complète", img: "/project1-building.jpg" },
+    { title: "Centre commercial", scope: "15 000 pi²", location: "Joliette", stat: "Plomberie commerciale", img: "/project2-industrial.jpg" },
+    { title: "Condo neuf", scope: "48 unités", location: "Repentigny", stat: "Construction neuve", img: "/project3-worker.jpg" },
+    { title: "Hôpital régional", scope: "Rénovation majeure", location: "Saint-Charles-Borromée", stat: "Infrastructure critique", img: "/project4-building-finished.jpg" },
   ]
+  const headingRef = useScrollReveal()
+  const setCardRef = useStaggerReveal(projects.length)
 
   return (
     <section id="projets" className="py-20 bg-surface">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-14">
+        <div ref={headingRef} className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold mb-4">Nos Projets</h2>
           <p className="text-txt2 max-w-2xl mx-auto">
             Des projets d&apos;envergure qui témoignent de notre expertise et de notre engagement envers la qualité.
@@ -189,19 +252,27 @@ function Projects() {
 
         <div className="grid sm:grid-cols-2 gap-6">
           {projects.map((project, i) => (
-            <GlowCard key={i} className="p-0 overflow-hidden group">
-              {/* Gradient placeholder for project image */}
-              <div className="h-48 bg-gradient-to-br from-accent/20 via-surface2 to-accent2/10 flex items-center justify-center">
-                <Building2 className="w-12 h-12 text-accent/30" />
-              </div>
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent font-semibold">{project.stat}</span>
+            <div key={i} ref={setCardRef(i)}>
+              <GlowCard className="p-0 overflow-hidden group">
+                <div className="relative h-56 overflow-hidden">
+                  <Image
+                    src={project.img}
+                    alt={project.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-bg/20 to-transparent" />
                 </div>
-                <h3 className="text-lg font-heading font-bold mb-1">{project.title}</h3>
-                <p className="text-sm text-txt2">{project.scope} — {project.location}</p>
-              </div>
-            </GlowCard>
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-accent/10 text-accent font-semibold">{project.stat}</span>
+                  </div>
+                  <h3 className="text-lg font-heading font-bold mb-1">{project.title}</h3>
+                  <p className="text-sm text-txt2">{project.scope} — {project.location}</p>
+                </div>
+              </GlowCard>
+            </div>
           ))}
         </div>
       </div>
@@ -218,10 +289,13 @@ function Trust() {
     { Icon: BadgeCheck, title: "Garantie de travaux", desc: "Satisfaction garantie sur chaque projet" },
   ]
 
+  const sectionRef = useScrollReveal()
+  const setCardRef = useStaggerReveal(points.length)
+
   return (
     <section id="confiance" className="py-20 bg-bg">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div ref={sectionRef} className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left — editorial text */}
           <div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold leading-tight mb-6">
@@ -238,11 +312,13 @@ function Trust() {
           {/* Right — trust points */}
           <div className="grid grid-cols-2 gap-4">
             {points.map(({ Icon, title, desc }, i) => (
-              <GlowCard key={i} className="p-5 text-center">
-                <Icon className="w-8 h-8 text-accent mx-auto mb-3" />
-                <h4 className="font-heading font-bold text-sm mb-1">{title}</h4>
-                <p className="text-xs text-txt3">{desc}</p>
-              </GlowCard>
+              <div key={i} ref={setCardRef(i)}>
+                <GlowCard className="p-5 text-center h-full">
+                  <Icon className="w-8 h-8 text-accent mx-auto mb-3" />
+                  <h4 className="font-heading font-bold text-sm mb-1">{title}</h4>
+                  <p className="text-xs text-txt3">{desc}</p>
+                </GlowCard>
+              </div>
             ))}
           </div>
         </div>
@@ -253,9 +329,10 @@ function Trust() {
 
 // ─── TESTIMONIAL ───
 function Testimonial() {
+  const ref = useScrollReveal()
   return (
     <section className="py-20 bg-surface">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+      <div ref={ref} className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
         <div className="flex justify-center gap-1 mb-6">
           {[...Array(5)].map((_, i) => (
             <Star key={i} className="w-5 h-5 text-gold fill-gold" />
@@ -283,10 +360,13 @@ function Approach() {
     { num: "03", Icon: Handshake, title: "Suivi & garantie", desc: "Suivi préventif, inspections régulières et service d'urgence pour assurer la pérennité de vos installations." },
   ]
 
+  const headingRef = useScrollReveal()
+  const setCardRef = useStaggerReveal(steps.length)
+
   return (
     <section id="approche" className="py-20 bg-bg">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-14">
+        <div ref={headingRef} className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold mb-4">Notre Approche</h2>
           <p className="text-txt2 max-w-2xl mx-auto">
             Une méthodologie éprouvée qui favorise la transparence et la qualité à chaque étape.
@@ -295,7 +375,7 @@ function Approach() {
 
         <div className="grid md:grid-cols-3 gap-6">
           {steps.map(({ num, Icon, title, desc }, i) => (
-            <div key={i} className="relative">
+            <div key={i} ref={setCardRef(i)} className="relative">
               {/* Connecting line */}
               {i < steps.length - 1 && (
                 <div className="hidden md:block absolute top-10 left-[calc(100%)] w-full h-[1px] bg-gradient-to-r from-accent/30 to-transparent z-0" />
@@ -330,10 +410,12 @@ function ContactSection() {
     setSent(true)
   }
 
+  const headingRef = useScrollReveal()
+
   return (
     <section id="contact" className="py-20 bg-surface">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-14">
+        <div ref={headingRef} className="text-center mb-14">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold mb-4">
             Parlons de votre projet
           </h2>

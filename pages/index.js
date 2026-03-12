@@ -84,8 +84,8 @@ function Hero() {
       <div className="absolute inset-0 bg-gradient-to-r from-bg/90 via-bg/50 to-transparent z-[1]" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-32 pb-20 md:py-0 w-full">
-        <div className="max-w-3xl">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-32 pb-20 md:py-0 w-full text-center">
+        <div className="max-w-3xl mx-auto">
           {/* Tagline pill */}
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 mb-8 opacity-0 animate-fade-in"
@@ -109,7 +109,7 @@ function Hero() {
 
           {/* Subtext */}
           <p
-            className="text-base sm:text-lg text-txt2 mb-10 max-w-xl leading-relaxed opacity-0 animate-fade-in"
+            className="text-base sm:text-lg text-txt2 mb-10 max-w-xl mx-auto leading-relaxed opacity-0 animate-fade-in"
             style={{ animationDelay: "1.2s", animationFillMode: "forwards" }}
           >
             Plomberie commerciale et résidentielle d&apos;envergure.
@@ -119,7 +119,7 @@ function Hero() {
 
           {/* CTAs */}
           <div
-            className="flex flex-col sm:flex-row gap-4 opacity-0 animate-fade-in"
+            className="flex flex-col sm:flex-row gap-4 justify-center opacity-0 animate-fade-in"
             style={{ animationDelay: "1.4s", animationFillMode: "forwards" }}
           >
             <a href="#contact">

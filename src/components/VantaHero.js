@@ -12,26 +12,27 @@ export default function VantaHero() {
     async function initVanta() {
       try {
         const THREE = await import("three")
-        const WAVES = (await import("vanta/dist/vanta.waves.min")).default
+        const { default: WAVES } = await import("vanta/dist/vanta.waves.min")
 
         if (!mounted || !ref.current) return
 
         const effect = WAVES({
           el: ref.current,
-          THREE,
+          THREE: THREE,
           color: 0x0a1628,
           shininess: 35,
           waveHeight: 15,
-          waveSpeed: 0.5,
-          zoom: 0.8,
+          waveSpeed: 0.7,
+          zoom: 0.85,
           mouseControls: true,
-          touchControls: false,
+          touchControls: true,
+          gyroControls: false,
           minHeight: 200,
           minWidth: 200,
         })
         setVantaEffect(effect)
       } catch (e) {
-        // Vanta failed to load — silent fallback (dark bg shows through)
+        console.error("Vanta init failed:", e)
       }
     }
 

@@ -339,13 +339,13 @@ function Testimonial() {
           ))}
         </div>
         <blockquote className="text-xl sm:text-2xl font-heading leading-relaxed text-txt mb-6">
-          &ldquo;Plomberie M.V nous a accompagnés dans la construction d&apos;un complexe
-          de 120 logements. Leur professionnalisme et leur réactivité ont fait toute
-          la différence. Un partenaire de confiance pour nos projets d&apos;envergure.&rdquo;
+          &ldquo;Plomberie M.V a géré toute la plomberie de notre projet multi-logements.
+          Travail propre, dans les délais, et toujours disponibles quand on avait besoin
+          d&apos;ajustements. On les rappelle pour chaque nouveau projet.&rdquo;
         </blockquote>
         <div>
-          <p className="font-heading font-bold text-accent">Gestion Immobilière Lanaudière</p>
-          <p className="text-sm text-txt3">Promoteur immobilier</p>
+          <p className="font-heading font-bold text-accent">Entrepreneur général — Lanaudière</p>
+          <p className="text-sm text-txt3">Construction résidentielle</p>
         </div>
       </div>
     </section>

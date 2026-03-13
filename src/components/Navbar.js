@@ -31,7 +31,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-4">
         {/* Logo */}
         <a href="#accueil" className="flex items-center gap-3 group">
-          <div className="relative w-11 h-11 rounded-xl overflow-hidden border border-accent/30 group-hover:border-accent transition-colors bg-surface">
+          <div className="relative w-11 h-11 rounded-xl overflow-hidden">
             <Image
               src="/logo-mv.png"
               alt="Logo Plomberie M.V"

@@ -84,7 +84,7 @@ function Hero() {
       <div className="absolute inset-0 bg-gradient-to-r from-bg/90 via-bg/50 to-transparent z-[1]" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-32 pb-20 md:py-0 w-full text-center">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 pt-32 pb-20 md:pt-24 md:pb-0 w-full text-center">
         <div className="max-w-3xl mx-auto">
           {/* Tagline pill */}
           <div

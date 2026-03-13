@@ -232,10 +232,10 @@ function Services() {
 // ─── PROJECTS SHOWCASE ───
 function Projects() {
   const projects = [
-    { title: "Bloc appartements", scope: "12 logements", location: "Joliette", stat: "Rénovation complète", img: "/project1-pipes.jpg" },
-    { title: "Restaurant commercial", scope: "Cuisine + salles de bain", location: "Repentigny", stat: "Mise aux normes", img: "/project2-kitchen.jpg" },
-    { title: "Duplex neuf", scope: "Construction neuve", location: "Saint-Félix-de-Valois", stat: "Plomberie complète", img: "/project3-construction.jpg" },
-    { title: "Immeuble à revenus", scope: "8 unités", location: "Lavaltrie", stat: "Remplacement de colonne", img: "/project4-pipes.jpg" },
+    { title: "Bloc appartements", scope: "12 logements", location: "Joliette", stat: "Rénovation complète", img: "/photo-6.jpg" },
+    { title: "Restaurant commercial", scope: "Cuisine + salles de bain", location: "Repentigny", stat: "Mise aux normes", img: "/photo-2.jpg" },
+    { title: "Duplex neuf", scope: "Construction neuve", location: "Saint-Félix-de-Valois", stat: "Plomberie complète", img: "/photo-1.jpg" },
+    { title: "Immeuble à revenus", scope: "8 unités", location: "Lavaltrie", stat: "Remplacement de colonne", img: "/photo-5.jpg" },
   ]
   const headingRef = useScrollReveal()
   const setCardRef = useStaggerReveal(projects.length)
